@@ -134,10 +134,56 @@ const destroy = async(req, res) => {
   }
 } 
 
+const addPhoto = async (req, res) => {
+  // check for any validation errors
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).send({ status: 'fail', data: errors.array() });
+  }
+
+  // get only the validated data from request
+  const validData = matchedData(req);
+
+  // fetch album and eager-load photos relation
+  const album = await models.Album.fetchById(req.params.albumId, { withRelated: ['photos'] });
+
+  // get the album's photos
+  const photos = album.related('photos');
+
+  // check if the photo is already in the album's list of books
+  const existingPhoto = photos.find(photo => photo.id == validData.photo.id);
+
+  // if it already exists, bail
+	if (existingPhoto) {
+		return res.send({
+			status: 'fail',
+			data: 'Photo already exists.',
+		});
+	}
+
+	try {
+		const result = await album.photos().attach(validData.photo_id);
+		debug("Added photo to album successfully: %O", result);
+
+		res.send({
+			status: 'success',
+			data: null,
+		});
+
+	} catch (error) {
+		res.status(500).send({
+			status: 'error',
+			message: 'Exception thrown in database when adding a photo to a album.',
+		});
+		throw error;
+	}
+}
+
 module.exports = {
  index,
  show,
  store,
  update,
  destroy,
+ addPhoto,
 }
