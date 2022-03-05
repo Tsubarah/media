@@ -10,6 +10,6 @@ module.exports = (bookshelf) => {
     albums() {
       return this.hasMany('Album');
     }
-	})
+	});
 };
 

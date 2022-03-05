@@ -150,7 +150,7 @@ const addPhoto = async (req, res) => {
   // get the album's photos
   const photos = album.related('photos');
 
-  // check if the photo is already in the album's list of books
+  // check if the photo is already in the album's list of photos
   const existingPhoto = photos.find(photo => photo.id == validData.photo.id);
 
   // if it already exists, bail
