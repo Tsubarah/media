@@ -144,7 +144,7 @@ const addPhoto = async (req, res) => {
   // get only the validated data from request
   const validData = matchedData(req);
 
-  // fetch album and eager-load photos relation
+  // fetch album and photos relation
   const album = await models.Album.fetchById(req.params.albumId, { withRelated: ['photos'] });
 
   // get the album's photos

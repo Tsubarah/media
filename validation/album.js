@@ -18,7 +18,7 @@ const updateRules = [
 
 // Add photo to album validation rules
 const addPhotoRules = [
-	body('photo_id').exists().bail().custom(async value => {
+	body('photo_id').exists().isInt().bail().custom(async value => {
 		const photo = await new models.Photo({ id: value }).fetch({ require: false });
 		if (!photo) {
 			return Promise.reject(`The photo with the ID ${value} does not exist.`);
