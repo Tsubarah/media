@@ -38,7 +38,9 @@ const register = async (req, res) => {
 		res.send({
 			status: 'success',
 			data: {
-				user
+				email: validData.email,
+        first_name: validData.first_name,
+        last_name: validData.last_name
 			},
 		});
 
@@ -51,32 +53,6 @@ const register = async (req, res) => {
 	}
 };
 
-
-/**
- * Post login a user with: 
- * "username": "",
- * "password": ""
- */
-
-const login = async (req, res) => {
-    const email = req.body.email;
-    const password = req.body.password;
-
-    const user = await models.User.login(email, password);
-    if (!user) {
-        return res.status(401).send({
-            status: "fail",
-            data: "Login failed.",
-        });
-    }
-
-    return res.status(200).send({
-      status: 'success',
-      data: user
-    });
-};
-
 module.exports = {
   register,
-  login
 }

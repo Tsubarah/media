@@ -14,12 +14,12 @@ const createRules = [
     if (email) {
       return Promise.reject("This email already exists.");
     }
-
+    
     return Promise.resolve();
   }),
   body('password').exists().isLength({ min: 6 }),
-  body('first_name').exists().isLength({ min: 2 }),
   body('last_name').exists().isLength({ min: 2 }),
+  body('first_name').exists().isLength({ min: 2 }),
 ];
 
 // Optional validation rules for updating a user

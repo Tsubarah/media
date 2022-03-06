@@ -21,7 +21,4 @@ router.use('/users', require('./users'));
 // register a user
 router.post('/register', user_validationRules.createRules, auth_controller.register);
 
-// login with a user
-router.post('/login', auth_controller.login);
-
 module.exports = router;
