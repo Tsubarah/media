@@ -18,8 +18,8 @@ const createRules = [
     return Promise.resolve();
   }),
   body('password').exists().isLength({ min: 6 }),
-  body('last_name').exists().isLength({ min: 2 }),
-  body('first_name').exists().isLength({ min: 2 }),
+  body('last_name').exists().isLength({ min: 3 }),
+  body('first_name').exists().isLength({ min: 3 }),
 ];
 
 // Optional validation rules for updating a user
