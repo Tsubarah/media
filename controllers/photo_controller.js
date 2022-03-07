@@ -122,36 +122,9 @@ const update = async (req, res) => {
   }
 }
 
-// DELETE a specific photo
-const destroy = async(req, res) => {
-  try {
-      let photo = await models.Photo.where( { "id" : req.params.id  } ).fetch( { require: true } );
-      photo = await photo.destroy();
-
-      return res.status(200).send(
-          {
-              success: true, 
-              data: {
-                  photo
-              }
-          }
-      );
-
-  } catch (err) {
-      log('Destroy failed %s', err.message);
-      return res.status(500).send(
-          {
-              success: false,
-              data: err.message
-          }
-      );  
-  }
-} 
-
 module.exports = {
  index,
  show,
  store,
  update,
- destroy,
 }

@@ -123,32 +123,6 @@ const update = async (req, res) => {
   }
 }
 
-// DELETE a specific album
-const destroy = async(req, res) => {
-  try {
-      let album = await models.Album.where( { "id" : req.params.id  } ).fetch( { require: true } );
-      album = await album.destroy();
-
-      return res.status(200).send(
-          {
-              success: true, 
-              data: {
-                  album
-              }
-          }
-      );
-
-  } catch (err) {
-      log('Destroy failed %s', err.message);
-      return res.status(500).send(
-          {
-              success: false,
-              data: err.message
-          }
-      );  
-  }
-} 
-
 const addPhoto = async (req, res) => {
   // check for any validation errors
   const errors = validationResult(req);
@@ -199,6 +173,5 @@ module.exports = {
  show,
  store,
  update,
- destroy,
  addPhoto,
 }
