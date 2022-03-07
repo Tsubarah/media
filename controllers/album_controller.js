@@ -2,27 +2,29 @@ const debug = require('debug')('media:album_controller');
 const { matchedData, validationResult } = require('express-validator');
 const models = require('../models');
 
-// GET all the albums
+// GET all the albums for authenticated user
 const index = async (req, res) => {
-  const all_albums = await models.Album.fetchAll();
 
-  res.send({
+  const user = await models.User.fetchById(req.user.id, { withRelated: ['albums']});
+ 
+  res.status(200).send({
     status: 'success',
     data: {
-      albums: all_albums
+      albums: user.related('albums')
     }
   });
-}
+};
 
-// GET a specific album with photos and users
+// GET a specific album with photos for authenticated user
 const show = async (req, res) => {
-  const album = await new models.Album({ id: req.params.albumId })
-    .fetch({ withRelated: ['photos', 'users'] });
+
+
+  const albumId = await models.Album.fetchById(req.params.albumId, { withRelated: ['photos']});
 
   res.send({
     status: 'success',
     data: {
-      album
+      albums: albumId
     }
   });
 }
@@ -30,6 +32,7 @@ const show = async (req, res) => {
 // POST a new album
 const store = async (req, res) => {
    
+
   // check for any validation errors
   const errors = validationResult(req);
 
@@ -39,6 +42,8 @@ const store = async (req, res) => {
 
   // get only the validated data from the request
   const validData = matchedData(req);
+
+  validData.user_id = req.user.id;
   
   try {
     const album = await new models.Album(validData).save();

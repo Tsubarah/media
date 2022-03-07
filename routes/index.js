@@ -14,10 +14,13 @@ router.get('/', (req, res, next) => {
   });
 });
 
-router.use('/albums', require('./albums'));
-router.use('/photos', require('./photos'));
+router.use('/albums', auth.basic, require('./albums'));
+router.use('/photos', auth.basic, require('./photos'));
 
 // register a user
 router.post('/register', user_validationRules.createRules, user_controller.register);
+
+// login with a user
+router.post('/login', auth.basic, user_controller.login);
 
 module.exports = router;

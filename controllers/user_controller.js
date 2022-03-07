@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const debug = require('debug')('media:auth_controller');
+const debug = require('debug')('media:user_controller');
 const { matchedData, validationResult } = require('express-validator');
 const models = require('../models');
 
@@ -53,6 +53,33 @@ const register = async (req, res) => {
 	}
 };
 
+/**
+ * Post login a user with: 
+ * "username": "",
+ * "password": ""
+ */
+
+const login = async (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    // login user
+    const user = await models.User.login(email, password);
+    
+    if (!user) {
+        return res.status(401).send({
+            status: "fail",
+            data: "Login failed.",
+        });
+    }
+
+    return res.status(200).send({
+      status: 'success',
+      data: user
+    });
+};
+
 module.exports = {
   register,
+  login
 }

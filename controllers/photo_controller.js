@@ -40,6 +40,8 @@ const store = async (req, res) => {
   // get only the validated data from the request
   const validData = matchedData(req);
 
+  validData.user_id = req.user.id;
+  
   try {
     const photo = await new models.Photo(validData).save();
     debug("Created new photo successfully: %O", photo);
