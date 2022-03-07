@@ -14,8 +14,6 @@ const basic = async (req, res, next) => {
       data: 'Authorization required'
     });
   }
-  
-  // debug('Authorization header: %o', res.headers.authorization);
 
   // Split header into basic and payload
   const [authSchema, base64Payload] = req.headers.authorization.split(' ');

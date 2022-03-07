@@ -4,25 +4,37 @@ const models = require('../models');
 
 // GET all the photos
 const index = async (req, res) => {
-  const photo = await models.Photo.fetchAll();
+  
+  const user = await models.User.fetchById(req.user.id, { withRelated: ['photos']});
 
   res.send({
     status: 'success',
     data: {
-      photo
+      photos: user.related('photos')
     }
   });
 }
 
 // GET a specific photo
 const show = async (req, res) => {
-  const photo = await new models.Photo({ id: req.params.photoId })
-    .fetch({ withRelated: ['albums', 'users']});
+  
+  const user = await models.User.fetchById(req.user.id, { withRelated: ['photos']});
+  const userPhotos = user.related('photos');
+  const photos = userPhotos.find(photo => photo.id == req.params.photoId);
+
+  if (!photos) {
+    return res.status(404).send({
+        status: 'fail',
+        message: 'Photo could not be found',
+    });
+}
+
+  const photoId = await models.Photo.fetchById(req.params.photoId);
 
   res.send({
     status: 'success',
     data: {
-      photo
+      photos: photoId
     }
   });
 }
@@ -41,7 +53,7 @@ const store = async (req, res) => {
   const validData = matchedData(req);
 
   validData.user_id = req.user.id;
-  
+
   try {
     const photo = await new models.Photo(validData).save();
     debug("Created new photo successfully: %O", photo);
@@ -75,13 +87,14 @@ const update = async (req, res) => {
     debug("The photo to update could not be found. %o", { id: photoId });
     res.status(404).send({
       status: 'fail',
-      data: 'photo Not Found',
+      data: 'Photo could not be found',
     });
     return;
   }
 
   // check for any validation errors
   const errors = validationResult(req);
+  
   if (!errors.isEmpty()) {
     return res.status(422).send({ status: 'fail', data: errors.array() });
   }

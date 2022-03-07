@@ -18,6 +18,16 @@ const index = async (req, res) => {
 // GET a specific album with photos for authenticated user
 const show = async (req, res) => {
 
+  const user = await models.User.fetchById(req.user.id, { withRelated: ['albums']});
+  const userAlbums = user.related('albums');
+  const album = userAlbums.find(album => album.id == req.params.albumId);
+
+  if (!album) {
+    return res.status(404).send({
+        status: 'fail',
+        message: 'Album could not be found',
+    });
+};
 
   const albumId = await models.Album.fetchById(req.params.albumId, { withRelated: ['photos']});
 
@@ -27,7 +37,7 @@ const show = async (req, res) => {
       albums: albumId
     }
   });
-}
+};
 
 // POST a new album
 const store = async (req, res) => {
@@ -78,7 +88,7 @@ const update = async (req, res) => {
     debug("The album to update could not be found. %o", { id: albumId });
     res.status(404).send({
       status: 'fail',
-      data: 'album Not Found',
+      data: 'Album could not be found',
     });
     return;
   }

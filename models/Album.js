@@ -13,10 +13,3 @@ module.exports = (bookshelf) => {
 		}
 	});
 };
-
-
-      // belongsToMany - many to many
-
-      // belongsTo - 1 author
-
-      // hasMany - 1-n
