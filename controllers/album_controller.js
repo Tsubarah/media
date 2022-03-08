@@ -18,8 +18,11 @@ const index = async (req, res) => {
 // GET a specific album with photos for authenticated user
 const show = async (req, res) => {
 
+  // check for user
   const user = await models.User.fetchById(req.user.id, { withRelated: ['albums']});
+  // save the users related albums to the userAlbums
   const userAlbums = user.related('albums');
+  // find an album with requested album id
   const album = userAlbums.find(album => album.id == req.params.albumId);
 
   if (!album) {
@@ -29,6 +32,7 @@ const show = async (req, res) => {
     });
 };
 
+  // get the requested album id and the related photos
   const albumId = await models.Album.fetchById(req.params.albumId, { withRelated: ['photos']});
 
   res.send({
@@ -140,7 +144,7 @@ const addPhoto = async (req, res) => {
   const photos = album.related('photos');
 
   // check if the photo is already in the album's list of photos
-  const existingPhoto = photos.find(photo => photo.id == validData.photo.id);
+  const existingPhoto = photos.find(photo => photo.id == validData.photo_id);
 
   // if it already exists, bail
 	if (existingPhoto) {

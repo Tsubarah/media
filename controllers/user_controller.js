@@ -33,7 +33,7 @@ const register = async (req, res) => {
 
   try {
 		const user = await new models.User(validData).save();
-		debug("Created new user successfully: %O", user);
+		// debug("Created new user successfully: %O", user);
 
 		res.send({
 			status: 'success',

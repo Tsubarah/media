@@ -77,7 +77,7 @@ const store = async (req, res) => {
 // PUT (update) a photo
 const update = async (req, res) => {
 
-  // save the photo id
+  // save the photo id to a variable
   const photoId = req.params.photoId;
 
   // check if the album with the id exists
