@@ -77,17 +77,22 @@ const store = async (req, res) => {
 // PUT (update) a photo
 const update = async (req, res) => {
 
-  // save the photo id to a variable
-  const photoId = req.params.photoId;
+  const user = await models.User.fetchById(req.user.id, { withRelated: ['photos']});
 
-  // check if the album with the id exists
-  const photo = await new models.Photo({ id: photoId }).fetch({ require: false });
+  // save the users related photos to the userPhotos
+  const userPhotos = user.related('photos');
+  
+  // Find the requested photo
+  const photo = userPhotos.find(photo => photo.id == req.params.photoId);
+
+  // check if the photo with the id exists
+  const photoId = await models.Photo.fetchById(req.params.photoId);
 
   if (!photo) {
     debug("The photo to update could not be found. %o", { id: photoId });
     res.status(404).send({
       status: 'fail',
-      data: 'Photo could not be found',
+      data: 'Photo to update could not be found',
     });
     return;
   }
