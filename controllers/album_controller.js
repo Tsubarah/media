@@ -20,10 +20,10 @@ const show = async (req, res) => {
 
   // check for user
   const user = await models.User.fetchById(req.user.id, { withRelated: ['albums']});
-  // save the users related albums to the userAlbums
-  const userAlbums = user.related('albums');
-  // find an album with requested album id
-  const album = userAlbums.find(album => album.id == req.params.albumId);
+  
+  // get the users related albums and find the album id
+  const album = user.related('albums').find(album => album.id == req.params.albumId);
+  
 
   if (!album) {
     return res.status(404).send({
@@ -46,7 +46,6 @@ const show = async (req, res) => {
 // POST a new album
 const store = async (req, res) => {
    
-
   // check for any validation errors
   const errors = validationResult(req);
 
@@ -82,7 +81,7 @@ const store = async (req, res) => {
 // PUT (update) an album
 const update = async (req, res) => {
 
-  // check for user
+  // get user based on what user that is logged in (requested user) 
   const user = await models.User.fetchById(req.user.id, { withRelated: ['albums']});
 
   // save the users related albums to the userAlbums
@@ -91,8 +90,6 @@ const update = async (req, res) => {
   // find an album with requested album id
   const album = userAlbums.find(album => album.id == req.params.albumId);
 
-  // check if the album with the id exists
-  const albumId = await models.Album.fetchById(req.params.albumId);
 
   if (!album) {
      res.status(404).send({
@@ -133,6 +130,7 @@ const update = async (req, res) => {
 };
 
 const addPhoto = async (req, res) => {
+  
   // check for any validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -142,29 +140,20 @@ const addPhoto = async (req, res) => {
   // get only the validated data from request
   const validData = matchedData(req);
 
-
+  // get authenticated with related albums and photos
   const user = await models.User.fetchById(req.user.id, { withRelated: ['albums', 'photos']});
 
-  // get related albums and find the requested album
+  // get related albums from the user and find the requested album
   const userAlbum = user.related('albums').find(album => album.id == req.params.albumId);
 
-  // get related photos and find the requested photo
+  // get related photos from the user and find the requested photo
   const userPhoto = user.related('photos').find(photo => photo.id == validData.photo_id);
 
-
+  // get the requested album id
   const album = await models.Album.fetchById(req.params.albumId, { withRelated: ['photos']});
 
-  // find requested photo and add to album
+  // check if the photo already exists
   const existingPhoto = album.related('photos').find(photo => photo.id == validData.photo_id);
-
-  if (!album) {
-    debug("The album to update could not be found. %o", { id: photoId });
-    res.status(404).send({
-      status: 'fail',
-      data: 'Album to add could not be found',
-    });
-    return;
-  }
 
   if (existingPhoto) {
     return res.send({
@@ -173,17 +162,24 @@ const addPhoto = async (req, res) => {
     });
   }
 
-  if (!userAlbum || !userPhoto) {
+  if (!userAlbum) {
     res.status(403).send({
       status: 'fail',
-      data: 'Album or Photo could not be found'
+      data: 'Album could not be found'
+    });
+    return;
+  }
+
+  if (!userPhoto) {
+    res.status(403).send({
+      status: 'fail',
+      data: 'Photo could not be found'
     });
     return;
   }
   
 	try {
-		const result = await album.photos().attach(validData.photo_id);
-		debug("Added photo to album successfully: %O", result);
+    await album.photos().attach(validData.photo_id);
 
 		res.send({
 			status: 'success',

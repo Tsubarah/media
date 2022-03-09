@@ -19,15 +19,15 @@ const index = async (req, res) => {
 const show = async (req, res) => {
   
   const user = await models.User.fetchById(req.user.id, { withRelated: ['photos']});
-  const userPhotos = user.related('photos');
-  const photos = userPhotos.find(photo => photo.id == req.params.photoId);
+
+  const photos = user.related('photos').find(photo => photo.id == req.params.photoId);
 
   if (!photos) {
     return res.status(404).send({
         status: 'fail',
         message: 'Photo could not be found',
     });
-}
+  };
 
   const photoId = await models.Photo.fetchById(req.params.photoId);
 
@@ -77,14 +77,12 @@ const store = async (req, res) => {
 // PUT (update) a photo
 const update = async (req, res) => {
 
+  // get the requested user with related photos
   const user = await models.User.fetchById(req.user.id, { withRelated: ['photos']});
 
-  // save the users related photos to the userPhotos
-  const userPhotos = user.related('photos');
+  // get related photos from the user and find the requested photo
+  const photo = user.related('photos').find(photo => photo.id == req.params.photoId);
   
-  // Find the requested photo
-  const photo = userPhotos.find(photo => photo.id == req.params.photoId);
-
   // check if the photo with the id exists
   const photoId = await models.Photo.fetchById(req.params.photoId);
 
@@ -108,8 +106,7 @@ const update = async (req, res) => {
   const validData = matchedData(req);
 
   try {
-    const updatedPhoto = await photo.save(validData);
-    debug("Updated photo successfully: %O", updatedPhoto);
+    await photo.save(validData);
 
     res.send({
       status: 'success',

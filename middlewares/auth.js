@@ -1,4 +1,3 @@
-const debug = require('debug')('media:auth');
 const models = require('../models');
 
 
@@ -7,7 +6,6 @@ const basic = async (req, res, next) => {
   
   // check for Authorization header
   if (!req.headers.authorization) {
-    debug('Authorization header missing');
 
     return res.status(401).send({
       status: 'fail',
@@ -21,7 +19,6 @@ const basic = async (req, res, next) => {
   
   // check if the authSchema is not basic, if so fail the authorization
   if (authSchema.toLowerCase() !== "basic") {
-		debug("Authorization schema isn't basic");
 
 		return res.status(401).send({
 			status: 'fail',

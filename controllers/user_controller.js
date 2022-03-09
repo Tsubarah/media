@@ -8,8 +8,10 @@ const models = require('../models');
 // POST (register) a user 
 
 const register = async (req, res) => {
+
   // check for any validation errors
   const errors = validationResult(req);
+  
   if (!errors.isEmpty()) {
     return res.status(422).send({ status: 'fail', data: errors.array() });
   }
