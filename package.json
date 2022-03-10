@@ -1,6 +1,7 @@
 {
   "scripts": {
     "start": "node ./bin/www",
+    "dev": "cross-env DEBUG=media:* nodemon ./bin/www",
     "debug": "cross-env DEBUG=media:* nodemon --inspect ./bin/www"
   },
   "dependencies": {
