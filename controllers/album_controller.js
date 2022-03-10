@@ -35,7 +35,7 @@ const show = async (req, res) => {
   // get the requested album id and the related photos
   const albumId = await models.Album.fetchById(req.params.albumId, { withRelated: ['photos']});
 
-  res.send({
+  res.status(200).send({
     status: 'success',
     data: {
       albums: albumId
@@ -55,14 +55,14 @@ const store = async (req, res) => {
 
   // get only the validated data from the request
   const validData = matchedData(req);
-
+  
   validData.user_id = req.user.id;
   
   try {
     const album = await new models.Album(validData).save();
     debug("Created new album successfully: %O", album);
 
-    res.send({
+    res.status(200).send({
       status: 'success',
       data: {
         album
@@ -113,7 +113,7 @@ const update = async (req, res) => {
     const updatedAlbum = await album.save(validData);
     debug("Updated album successfully: %O", updatedAlbum);
 
-    res.send({
+    res.status(200).send({
       status: 'success',
       data: {
         album
@@ -151,19 +151,19 @@ const addPhoto = async (req, res) => {
 
   // get the requested album id
   const album = await models.Album.fetchById(req.params.albumId, { withRelated: ['photos']});
-
+  
   // check if the photo already exists
   const existingPhoto = album.related('photos').find(photo => photo.id == validData.photo_id);
 
   if (existingPhoto) {
-    return res.send({
+    return res.status(409).send({
       status: 'fail',
       data: "The photo already exists"
     });
   }
 
   if (!userAlbum) {
-    res.status(403).send({
+    res.status(404).send({
       status: 'fail',
       data: 'Album could not be found'
     });
@@ -171,7 +171,7 @@ const addPhoto = async (req, res) => {
   }
 
   if (!userPhoto) {
-    res.status(403).send({
+    res.status(404).send({
       status: 'fail',
       data: 'Photo could not be found'
     });
@@ -181,7 +181,7 @@ const addPhoto = async (req, res) => {
 	try {
     await album.photos().attach(validData.photo_id);
 
-		res.send({
+		res.status(200).send({
 			status: 'success',
 			data: null,
     });
